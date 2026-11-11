@@ -128,6 +128,21 @@ body{display:flex;flex-direction:column;height:100vh}
 .cmp tbody tr:last-child td{background:#150d27;font-weight:700}
 .cmp tbody tr:last-child td:last-child{color:#6fe08a}
 
+.ratio{font-size:12px;line-height:1.5;margin:0 0 8px;color:var(--mut)}.ratio b{color:var(--y)}
+.scn{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 8px}
+.scn button{min-height:44px;background:var(--pn2);border:3px solid var(--ln);padding:5px 6px;text-align:left;color:var(--ink);min-width:0}
+.scn button small{display:block;font-size:10px;color:var(--mut);line-height:1.25}.scn button b{display:block;margin-top:3px;font:700 12px/1.3 Inter,system-ui,sans-serif;color:var(--y);white-space:nowrap}
+.scn button.on{border-color:var(--y);background:#150d27}
+.wr{display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:11px;margin:6px 0}.wr b{color:var(--y);white-space:nowrap}.wr i{grid-column:1/-1;display:block;height:6px;background:#6fe08a}.wr i.neg{background:var(--pk)}
+.pov input[type=range]:disabled{opacity:.35}
+.cmpgrp{font:8px/1.4 'Press Start 2P',monospace;color:var(--y);margin:12px 0 2px}
+.cmpbtn{display:block;width:100%;margin:2px 0 12px;padding:10px 12px;text-align:left;border:3px solid var(--ln);background:#fff;color:#1b1230;box-shadow:0 5px 0 var(--ln);min-height:56px;cursor:pointer;animation:cmpBlink 1.4s steps(1) infinite}
+.cmpbtn b{display:block;font:700 14px/1.25 Inter,system-ui,sans-serif}
+.cmpbtn small{display:block;margin-top:4px;font:600 11px/1.3 Inter,system-ui,sans-serif}
+.cmpbtn:hover{background:var(--y)}.cmpbtn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ln)}
+@keyframes cmpBlink{0%{outline:3px solid var(--pk);outline-offset:0}50%{outline:3px solid transparent;outline-offset:0}}
+@media(prefers-reduced-motion:reduce){.cmpbtn{animation:none;outline:3px solid var(--pk)}}
+@media(max-width:1100px){.app>aside.pn:last-of-type>.cmpbtn{margin:0;min-height:44px;padding:6px 10px}.app>aside.pn:last-of-type>.cmpbtn b{font-size:12px}.app>aside.pn:last-of-type>.cmpbtn small{display:none}}
 </style></head><body>
 <div class="top"><span class="lg">TIMKUSH</span><div class="hl">Соберите свой <em>кабинет</em></div>
 <div class="mt"><div class="chip"><small>Комната</small><b id="mA">12 м²</b></div><div class="chip"><small>Занято <span id="mH" style="color:var(--y)"></span></small><b id="mP">0%</b><div class="bar"><i id="mB"></i></div></div><div class="chip"><small>Бюджет</small><b id="mS">0 ₽</b></div></div></div>
@@ -143,14 +158,14 @@ body{display:flex;flex-direction:column;height:100vh}
 <div class="leg">Внешний вид и габариты мебели условные, точные размеры уточним по каталогу.</div></div>
 <aside class="pn"><h2>ВАШ КАБИНЕТ</h2><div id="list"></div>
 <div class="tot"><span>ИТОГО</span><b id="tS">0 ₽</b></div><div class="sub" id="tN">цены «от», расчёт до заказа</div>
-<button class="lnk" id="payOpen" type="button">Посчитать окупаемость →</button>
+<button class="cmpbtn" id="payOpen" type="button"><b>Сравни: дешёвое и наше →</b><small id="payTeaser"></small></button>
 <div class="send"><a class="btn" id="wa" href="#" target="_blank" rel="noopener">Отправить в WhatsApp</a><button class="btn o" id="tg" type="button">Скопировать и открыть Telegram</button></div>
 <div class="sm">Имя и телефон не нужны: весь список уйдёт одним сообщением.</div></aside></div>
 <div class="pov" id="pov" role="dialog" aria-modal="true" aria-labelledby="pT">
 <div class="pbox"><button class="pclose" id="pX" type="button" aria-label="Закрыть">✕</button>
 <h2 id="pT">ЭКОНОМИКА КАБИНЕТА</h2>
-<div class="tabs"><button class="tab on" id="tabA" type="button">Окупаемость</button><button class="tab" id="tabB" type="button">Дешёвое vs Timkush</button></div>
-<div class="pbody"><div class="pane on" id="paneA">
+<div class="tabs"><button class="tab on" id="tabB" type="button">Дешёвое vs Timkush</button><button class="tab" id="tabA" type="button">Окупаемость</button></div>
+<div class="pbody"><div class="pane" id="paneA">
 <div class="pgrid"><div><small>Выручка в месяц</small><b id="q1"></b></div><div><small>Расходы в месяц</small><b id="q2"></b></div><div><small>Прибыль в месяц</small><b id="q3"></b></div><div><small>Оборудование</small><b id="q4"></b></div></div>
 <div class="pver" id="q5"></div>
 <canvas id="pch" width="320" height="120" aria-label="График накопленной прибыли и стоимости оборудования"></canvas>
@@ -164,17 +179,32 @@ body{display:flex;flex-direction:column;height:100vh}
 <div class="pr"><label for="p6">Налог и эквайринг, %</label><b id="p6v"></b></div><input id="p6" type="range" min="0" max="15" step="1" value="6">
 <div class="pr"><label for="p7">Реклама и прочее, ₽/мес</label><b id="p7v"></b></div><input id="p7" type="range" min="0" max="100000" step="1000" value="15000">
 </div>
-<div class="pane" id="paneB">
-<p class="pnote">Сравнение за 3 года: таблица пересчитывается ползунками ниже. Чек, клиенты, дни, аренда и расходники — из вкладки «Окупаемость».</p>
-<table class="cmp"><thead><tr><th></th><th>Обычное</th><th>Timkush</th></tr></thead><tbody id="cmpBody"></tbody></table>
+<div class="pane on" id="paneB">
+<p class="pnote" id="cnote"></p>
+<div class="ratio" id="cratio"></div>
+<div class="scn" id="scn" role="group" aria-label="Сценарий сравнения"></div>
+<p class="pnote" id="scdesc"></p>
 <div class="pver" id="cver"></div>
+<table class="cmp"><thead><tr><th></th><th>Обычное</th><th>Timkush</th></tr></thead><tbody id="cmpBody"></tbody></table>
+<div id="cwf"></div>
 <div class="pcap">Ползунки — что подставить в сравнение</div>
-<div class="pr"><label for="c1">Цена обычного кресла, ₽</label><b id="c1v"></b></div><input id="c1" type="range" min="5000" max="60000" step="1000" value="20000">
-<div class="pr"><label for="c2">Срок службы обычного, лет</label><b id="c2v"></b></div><input id="c2" type="range" min="1" max="6" step="0.5" value="2">
-<div class="pr"><label for="c3">Ремонт обычного, ₽/год</label><b id="c3v"></b></div><input id="c3" type="range" min="0" max="30000" step="1000" value="6000">
-<div class="pr"><label for="c4">Простой из-за ремонта и замены, дн./год</label><b id="c4v"></b></div><input id="c4" type="range" min="0" max="30" step="1" value="8">
-<div class="pr"><label for="c5">Срок службы Timkush, лет</label><b id="c5v"></b></div><input id="c5" type="range" min="3" max="12" step="1" value="6">
+<div class="cmpgrp">ЭФФЕКТ НА ДОХОД</div>
+<p class="pnote">Клиенту приятно сидеть в таком кресле — он возвращается и рассказывает о салоне. Мастеру проще работать: он меньше устаёт и делает работу лучше.</p>
 <div class="pr"><label for="c6">Надбавка к чеку за премиум, %</label><b id="c6v"></b></div><input id="c6" type="range" min="0" max="40" step="1" value="15">
+<div class="pr"><label for="c8">Мастер меньше устаёт и работает быстрее: приёмов в день больше на</label><b id="c8v"></b></div><input id="c8" type="range" min="0" max="1.5" step="0.1" value="0.3">
+<div class="pr"><label for="c9">Клиенты приходят снова и приводят знакомых, в мес.</label><b id="c9v"></b></div><input id="c9" type="range" min="0" max="15" step="1" value="3">
+<div class="cmpgrp">ОБЫЧНОЕ КРЕСЛО</div>
+<div class="pr"><label for="c1">Цена, ₽</label><b id="c1v"></b></div><input id="c1" type="range" min="5000" max="80000" step="1000" value="20000">
+<div class="pr"><label for="c2">Срок службы, лет</label><b id="c2v"></b></div><input id="c2" type="range" min="1" max="6" step="0.5" value="2">
+<div class="pr"><label for="c4">Поломок в год</label><b id="c4v"></b></div><input id="c4" type="range" min="0" max="8" step="0.5" value="2">
+<div class="pr"><label for="c3">Стоимость одного ремонта, ₽</label><b id="c3v"></b></div><input id="c3" type="range" min="0" max="15000" step="500" value="3000">
+<div class="pr"><label for="c10">Простой на один ремонт, дн.</label><b id="c10v"></b></div><input id="c10" type="range" min="0" max="7" step="0.5" value="2">
+<div class="pr"><label for="c11">Простой на замену: заказ и доставка нового, дн.</label><b id="c11v"></b></div><input id="c11" type="range" min="0" max="30" step="1" value="7">
+<div class="cmpgrp">TIMKUSH</div>
+<div class="pr"><label for="c7">Цена, ₽</label><b id="c7v"></b></div><input id="c7" type="range" min="20000" max="300000" step="1000" value="130000"><button class="lnk" id="c7r" type="button" hidden>взять цену из конфигуратора</button>
+<div class="pr"><label for="c5">Срок службы, лет</label><b id="c5v"></b></div><input id="c5" type="range" min="3" max="12" step="1" value="6">
+<div class="pr"><label for="c12">Поломок в год</label><b id="c12v"></b></div><input id="c12" type="range" min="0" max="4" step="0.1" value="0.3">
+<p class="pnote">Простой в год = поломки × дни на ремонт + дни на замену, делённые на срок службы. Ремонт — поломки × стоимость ремонта. Всё это допущения: подставьте свои цифры.</p>
 </div>
 </div><button class="btn o pcta" id="payAdd" type="button">Добавить расчёт в заявку</button>
 </div></div>
@@ -263,7 +293,7 @@ else{for(const n of nb)if(n>=16&&(n>>4)!==(v>>4)&&(st.order&&(st.order[n>>4]??-1
 const cv=$('sc'),ctx=cv.getContext('2d'),Rm=new Ras(CW,CH),BG=pk(27,18,48);let raf=0,blink=0;
 function render(){geo();scene(Rm,BG);items(Rm);outline(Rm,st.sel,blink);ctx.putImageData(new ImageData(new Uint8ClampedArray(Rm.c.buffer),CW,CH),0,0)}
 function draw(){render();const now=performance.now();if(!raf&&st.items.some(i=>now<i.t0+540)){raf=requestAnimationFrame(()=>{raf=0;draw()})}
-$('tb').style.display=st.items.some(i=>i.id===st.sel)?'flex':'none';stats();list()}
+$('tb').style.display=st.items.some(i=>i.id===st.sel)?'flex':'none';stats();list();try{cmpTeaser()}catch(e){}}
 setInterval(()=>{blink^=1;render()},420);
 function stats(){const A=st.w*st.d;let occ=0,sum=0,np=0;st.items.forEach(it=>{const r=rect(it);occ+=r.w*r.d*CELL*CELL;const p=sp(it).p;p?sum+=p:np++});
 const pc=Math.round(occ/A*100);$('mA').textContent=(+A.toFixed(1))+' м²';$('mP').textContent=pc+'%';$('mB').style.width=Math.min(100,pc)+'%';$('mB').style.background=pc>70?'#ff6b6b':pc>45?'#ffd93d':'#6fe08a';
@@ -333,32 +363,66 @@ function payUI(){const c=payCalc();
  $('pcap').textContent=(!c.eq||c.profit<=0)?'График появится, когда будет выбрана мебель и прибыль выше нуля.':(c.payback<1?'Столбцы — прибыль по месяцам, вложения окупаются раньше первого месяца.':'Столбцы — прибыль по месяцам, розовая линия — вложения '+fmt(c.eq)+', окупаются на '+Math.ceil(c.payback)+'-м мес.'); payChart()}
 [['p1','rent'],['p2','check'],['p3','cl'],['p4','days'],['p5','cons'],['p6','tax'],['p7','ads']].forEach(([id,k])=>{const el=$(id);el.value=PAY[k];el.oninput=()=>{PAY[k]=+el.value;payUI();if(PAY.add)draw()}});
 // --- сравнение с обычным креслом ---
-const CMP={p1:20000,life1:2,rep1:6000,down1:8,life2:6,uplift:15,h:3,seen:false};
-const cmpPrice=()=>paySum()||31900;
-function cmpSide(check,clients,price,life,rep,down){const tax=PAY.tax/100,rev=check*clients*PAY.days,cons=PAY.cons*clients*PAY.days,tx=rev*tax,amort=price/(life*12),repM=rep/12,lost=(check-PAY.cons)*(1-tax)*clients*down/12,profit=rev-cons-tx-PAY.rent-PAY.ads-amort-repM-lost;return{check,clients,price,life,rep,down,rev,cons,tx,amort,repM,lost,profit}}
-function cmpCalc(){const p2=cmpPrice(),a=cmpSide(PAY.check,PAY.cl,CMP.p1,CMP.life1,CMP.rep1,CMP.down1),b=cmpSide(PAY.check*(1+CMP.uplift/100),PAY.cl,p2,CMP.life2,0,0),adv=b.profit-a.profit,mon=CMP.h*12,invA=a.price*CMP.h/a.life,invB=b.price*CMP.h/b.life,buy=b.price-a.price,inv=invB-invA;return{a,b,adv,mon,invA,invB,buy,inv,gain:adv*mon,payback:adv>0&&inv>0?inv/adv:0}}
-function cmpBlock(){if(!CMP.seen)return'';const c=cmpCalc();return`\nСравнение с обычным креслом: ${fmt(c.a.price)} (${c.a.life} ${plural(c.a.life,'год','года','лет')}) против Timkush ${fmt(c.b.price)} (${c.b.life} ${plural(c.b.life,'год','года','лет')}); за ${CMP.h} ${plural(CMP.h,'год','года','лет')} прибыль ${fmt(Math.round(c.a.profit*c.mon))} против ${fmt(Math.round(c.b.profit*c.mon))}, разница ${fmt(Math.round(c.gain))}; ${c.buy>0?'переплата '+fmt(c.buy)+' отбивается за '+(c.inv<=0?'первый месяц':(c.payback<1?'меньше месяца':Math.ceil(c.payback)+' мес.')):'при покупке дешевле на '+fmt(-c.buy)}.`}
-function cmpUI(){const c=cmpCalc(),A=c.a,B=c.b,h=CMP.h;
- $('c1v').textContent=fmt(CMP.p1);$('c2v').textContent=CMP.life1+' '+plural(CMP.life1,'год','года','лет');$('c3v').textContent=fmt(CMP.rep1);
- $('c4v').textContent=CMP.down1+' дн.';$('c5v').textContent=CMP.life2+' '+plural(CMP.life2,'год','года','лет')+' (×'+(CMP.life2/CMP.life1).toFixed(1).replace('.',',')+')';$('c6v').textContent=CMP.uplift+'%';
+const CMP={p1:20000,life1:2,cost:3000,fail1:2,dRep:2,dNew:7,p2:null,life2:6,fail2:.3,uplift:15,xcl:.3,ref:3,sc:2,seen:false};
+const SCN=[['Срок и простой','Только то, что считается по цифрам: срок службы, ремонт и простой.'],['+ премиум-чек','Плюс: клиенты готовы платить больше за премиальное кресло и дизайн (надбавка к чеку).'],['+ клиенты возвращаются','Плюс: клиенту приятно сидеть в таком кресле, поэтому он приходит снова и рассказывает о салоне. Мастеру удобнее: он меньше устаёт, делает работу лучше и принимает больше клиентов.']];
+const cmpPrice=()=>CMP.p2||paySum()||130000;
+const fR=x=>x.toFixed(1).replace('.',','),yrs=n=>String(n).replace('.',',')+' '+plural(n,'год','года','лет');
+const fM=x=>{const a=Math.abs(x),sg=x<0?'−':'';return a>=1e6?sg+(a/1e6).toFixed(2).replace('.',',')+' млн ₽':sg+Math.round(a/1000)+' тыс ₽'};
+const cmpDown=(fail,life)=>fail*CMP.dRep+CMP.dNew/life;
+function cmpSide(check,clients,price,life,fail,ref,downOv){const tax=PAY.tax/100,vis=clients*PAY.days+(ref||0),rev=check*vis,cons=PAY.cons*vis,tx=rev*tax,amort=price/(life*12),rep=fail*CMP.cost,repM=rep/12,down=downOv!=null?downOv:cmpDown(fail,life),lost=(check-PAY.cons)*(1-tax)*clients*down/12,profit=rev-cons-tx-PAY.rent-PAY.ads-amort-repM-lost;return{check,clients,price,life,fail,rep,down,vis,rev,cons,tx,amort,repM,lost,profit}}
+function cmpCalc(){const p2=cmpPrice(),h=CMP.life2,mon=h*12,sc=CMP.sc,up=PAY.check*(1+CMP.uplift/100);
+ const a=cmpSide(PAY.check,PAY.cl,CMP.p1,CMP.life1,CMP.fail1,0),T=(chk,cl,rf,ov)=>cmpSide(chk,cl,p2,CMP.life2,CMP.fail2,rf,ov);
+ const v1=T(PAY.check,PAY.cl,0,a.down),v2=T(PAY.check,PAY.cl,0),v3=T(up,PAY.cl,0),v4=T(up,PAY.cl+CMP.xcl,0),v5=T(up,PAY.cl+CMP.xcl,CMP.ref);
+ const steps=[v1.profit-a.profit,v2.profit-v1.profit,v3.profit-v2.profit,v4.profit-v3.profit,v5.profit-v4.profit].map(x=>x*mon);
+ const cum=[steps[0]+steps[1],steps[0]+steps[1]+steps[2],steps.reduce((q,x)=>q+x,0)],b=[v2,v3,v5][sc];
+ const adv=b.profit-a.profit,invA=a.price*h/a.life,invB=b.price*h/b.life,buy=b.price-a.price,cash=(b.profit+b.amort)-(a.profit+a.amort);
+ return{a,b,h,mon,steps,cum,adv,gain:adv*mon,invA,invB,buy,inv:invB-invA,payback:buy>0&&cash>0?buy/cash:0,ratio:p2/CMP.p1,lifeRatio:CMP.life2/CMP.life1,own1:a.price/a.life+a.rep,own2:b.price/b.life+b.rep}}
+const cmpMon=n=>n<1?'меньше месяца':Math.ceil(n)+' '+plural(Math.ceil(n),'месяц','месяца','месяцев');
+const cmpPay=c=>c.payback>0?'отбивается за '+cmpMon(c.payback):'не отбивается';
+function cmpBlock(){if(!CMP.seen)return'';const c=cmpCalc();return`\nСравнение с обычным креслом: ${fmt(c.a.price)} (${yrs(c.a.life)}) против Timkush ${fmt(c.b.price)} (${yrs(c.b.life)}), дороже в ×${fR(c.ratio)}; в год владения ${fmt(Math.round(c.own1))} против ${fmt(Math.round(c.own2))}; простой ${fR(c.a.down)} против ${fR(c.b.down)} дн. в год; за ${yrs(c.h)} (${SCN[CMP.sc][0].toLowerCase()}) прибыль ${fmt(Math.round(c.a.profit*c.mon))} против ${fmt(Math.round(c.b.profit*c.mon))}, разница ${fmt(Math.round(c.gain))}${c.buy>0?'; переплата '+fmt(c.buy)+' '+cmpPay(c):''}.`}
+function cmpUI(){const c=cmpCalc(),A=c.a,B=c.b,h=c.h,sc=CMP.sc,ra=c.ratio,k=Math.ceil(h/A.life),cs=paySum();
+ $('c1v').textContent=fmt(CMP.p1);$('c2v').textContent=yrs(CMP.life1);$('c3v').textContent=fmt(CMP.cost);$('c4v').textContent=fR(CMP.fail1);
+ $('c5v').textContent=yrs(CMP.life2);$('c6v').textContent=CMP.uplift+'%';
+ if(CMP.p2==null)$('c7').value=Math.min(300000,Math.max(20000,cmpPrice()));$('c7v').textContent=fmt(cmpPrice())+' (×'+fR(ra)+')'+(CMP.p2==null&&cs?' · из конфигуратора':'');$('c7r').hidden=CMP.p2==null||!cs;
+ $('c8v').textContent='+'+fR(CMP.xcl)+' в день';$('c9v').textContent='+'+CMP.ref+' в мес.';
+ $('c10v').textContent=fR(CMP.dRep)+' дн.';$('c11v').textContent=CMP.dNew+' дн.';$('c12v').textContent=fR(CMP.fail2);
+ $('scdesc').textContent=SCN[sc][1];$('c6').disabled=sc<1;$('c8').disabled=$('c9').disabled=sc<2;
+ $('cnote').textContent='Сравнение за весь срок службы Timkush — '+yrs(h)+'. Обычное кресло за это время придётся купить '+k+' '+plural(k,'раз','раза','раз')+'. Чек, клиенты, дни, аренда и расходники — из вкладки «Окупаемость».';
+ $('cratio').innerHTML='Кажется, что Timkush дороже в <b>×'+fR(ra)+'</b>, но он служит в <b>×'+fR(c.lifeRatio)+'</b> дольше.<br>Кресло в год с ремонтом: <b>'+fmt(Math.round(c.own1))+'</b> против <b>'+fmt(Math.round(c.own2))+'</b>.<br>Простой в год: <b>'+fR(A.down)+' дн.</b> против <b>'+fR(B.down)+' дн.</b>';
+ $('scn').innerHTML=SCN.map((s,i)=>'<button type="button" data-i="'+i+'" aria-pressed="'+(i===sc)+'" class="'+(i===sc?'on':'')+'"><small>'+s[0]+'</small><b>'+(c.cum[i]>=0?'+':'')+fM(c.cum[i])+'</b></button>').join('');
  const rows=[['Цена, ₽',fmt(A.price),fmt(B.price)],
-  ['Срок службы',A.life+' '+plural(A.life,'год','года','лет'),B.life+' '+plural(B.life,'год','года','лет')],
-  ['Вложений за '+h+' '+plural(h,'год','года','лет'),fmt(Math.round(A.price*h/A.life)),fmt(Math.round(B.price*h/B.life))],
+  ['Срок службы',yrs(A.life),yrs(B.life)],
+  ['Вложений за '+yrs(h),fmt(Math.round(c.invA)),fmt(Math.round(c.invB))],
   ['Амортизация в месяц',fmt(Math.round(A.amort)),fmt(Math.round(B.amort))],
-  ['Ремонт за '+h+' '+plural(h,'год','года','лет'),fmt(Math.round(A.rep*h)),'—'],
-  ['Потери от простоя',fmt(Math.round(A.lost*h*12)),'—'],
-  ['Средний чек',fmt(A.check),fmt(B.check)],
-  ['Прибыль за '+h+' '+plural(h,'год','года','лет'),fmt(Math.round(A.profit*c.mon)),fmt(Math.round(B.profit*c.mon))]];
+  ['Поломок в год',fR(A.fail),fR(B.fail)],
+  ['Ремонт за '+yrs(h),fmt(Math.round(A.rep*h)),fmt(Math.round(B.rep*h))],
+  ['Дней простоя в год',fR(A.down),fR(B.down)],
+  ['Потери от простоя',fmt(Math.round(A.lost*c.mon)),fmt(Math.round(B.lost*c.mon))],
+  ['Средний чек',fmt(Math.round(A.check)),fmt(Math.round(B.check))],
+  ['Приёмов в месяц',String(Math.round(A.vis)),String(Math.round(B.vis))],
+  ['Прибыль за '+yrs(h),fmt(Math.round(A.profit*c.mon)),fmt(Math.round(B.profit*c.mon))]];
  $('cmpBody').innerHTML=rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('');
+ const labs=['Срок службы и ремонт','Меньше простоя (реже поломки и замены)','Премиум-чек','Мастер меньше устаёт: больше приёмов в день','Клиенты приходят снова и приводят знакомых'],ws=c.steps.slice(0,[2,3,5][sc]),mx=Math.max(1,...ws.map(Math.abs));
+ $('cwf').innerHTML='<div class="pcap">Где кресло зарабатывает: разница за '+yrs(h)+' по фронтам</div>'+ws.map((x,i)=>'<div class="wr"><span>'+labs[i]+'</span><b>'+(x<0?'−':'+')+fmt(Math.abs(Math.round(x)))+'</b><i class="'+(x<0?'neg':'')+'" style="width:'+Math.max(2,Math.abs(x)/mx*100).toFixed(1)+'%"></i></div>').join('');
  const v=$('cver');
- if(c.gain>0){const p=['За '+h+' '+plural(h,'год','года','лет')+' Timkush принесёт на <b>'+fmt(Math.round(c.gain))+'</b> больше.'];p.push(c.buy>0?'Переплата '+fmt(c.buy)+' отбивается за <b>'+(c.inv<=0?'первый же месяц':(c.payback<1?'меньше месяца':Math.ceil(c.payback)+' мес.'))+'</b>.':'При покупке Timkush ещё и дешевле на <b>'+fmt(-c.buy)+'</b>.');p.push('Вложения за '+h+' '+plural(h,'год','года','лет')+': '+fmt(Math.round(c.invA))+' против '+fmt(Math.round(c.invB))+(c.inv<0?' — Timkush дешевле в пересчёте на срок службы.':'.'));p.push('Владение в месяц: <b>'+fmt(Math.round(A.amort+A.repM))+'</b> против <b>'+fmt(Math.round(B.amort+B.repM))+'</b>.');if(A.lost>0)p.push('Плюс у обычного <b>'+fmt(Math.round(A.lost))+'/мес</b> теряется на простое.');v.innerHTML=p.join(' ')}
- else v.innerHTML='При таких вводных переплата не отбивается — разница в пользу дешёвого. Поднимите надбавку к чеку или срок службы Timkush.';
+ if(c.gain>0){const p=['Кресло кажется дороже в <b>×'+fR(ra)+'</b>, но за '+yrs(h)+' ('+SCN[sc][0].toLowerCase()+') приносит на <b>'+fmt(Math.round(c.gain))+'</b> больше.'];
+  if(c.buy>0)p.push('Переплата '+fmt(c.buy)+' '+(c.payback>0?'отбивается за <b>'+cmpMon(c.payback)+'</b>.':'не отбивается по денежному потоку.'));
+  else p.push('При покупке Timkush ещё и дешевле на <b>'+fmt(-c.buy)+'</b>.');
+  p.push('Вложения в кресло за '+yrs(h)+': '+fmt(Math.round(c.invA))+' против '+fmt(Math.round(c.invB))+(c.inv<0?' — Timkush дешевле.':'.'));
+  p.push('Обычное кресло простаивает '+fR(A.down)+' дн. в год из-за поломок и замен, Timkush — '+fR(B.down)+'.');
+  if(sc>0)p.push('Без надбавки к чеку и возвращающихся клиентов (только срок службы, ремонт, простой): <b>'+fmt(Math.round(c.cum[0]))+'</b>.');
+  v.innerHTML=p.join(' ')}
+ else v.innerHTML='При таких вводных переплата не отбивается — выигрывает дешёвое. Поднимите число поломок или простой обычного кресла, срок службы Timkush, либо выберите сценарий с премиум-чеком.';
 }
-[['c1','p1'],['c2','life1'],['c3','rep1'],['c4','down1'],['c5','life2'],['c6','uplift']].forEach(([id,k])=>{const el=$(id);el.value=CMP[k];el.oninput=()=>{CMP[k]=+el.value;cmpUI();if(PAY.add)draw()}});
+[['c1','p1'],['c2','life1'],['c3','cost'],['c4','fail1'],['c5','life2'],['c6','uplift'],['c8','xcl'],['c9','ref'],['c10','dRep'],['c11','dNew'],['c12','fail2']].forEach(([id,k])=>{const el=$(id);el.value=CMP[k];el.oninput=()=>{CMP[k]=+el.value;cmpUI();if(PAY.add)draw()}});
+$('c7').oninput=()=>{CMP.p2=+$('c7').value;cmpUI();if(PAY.add)draw()};
+$('c7r').onclick=()=>{CMP.p2=null;cmpUI();if(PAY.add)draw()};
+$('scn').onclick=e=>{const b=e.target.closest('button');if(!b)return;CMP.sc=+b.dataset.i;cmpUI();$('scn').children[CMP.sc].focus();if(PAY.add)draw()};
+function cmpTeaser(){const el=$('payTeaser');if(!el)return;const c=cmpCalc();el.textContent=c.gain>0?'Кажется дороже в ×'+fR(c.ratio)+', а за '+yrs(c.h)+' приносит на '+fM(c.gain)+' больше':'Сравните дешёвое кресло и наше в цифрах'}
 $('tabA').onclick=()=>{$('tabA').classList.add('on');$('tabB').classList.remove('on');$('paneA').classList.add('on');$('paneB').classList.remove('on')};
 $('tabB').onclick=()=>{CMP.seen=true;$('tabB').classList.add('on');$('tabA').classList.remove('on');$('paneB').classList.add('on');$('paneA').classList.remove('on');cmpUI();if(PAY.add)draw()};
-function payClose(){document.body.classList.remove('pov-on');$('pov').classList.remove('on');$('payOpen').focus()}
-$('payOpen').onclick=()=>{payUI();document.body.classList.add('pov-on');$('pov').classList.add('on');const pb=$('pov').querySelector('.pbox');pb.setAttribute('tabindex','-1');pb.focus()};
+function payClose(){try{cmpTeaser()}catch(e){}document.body.classList.remove('pov-on');$('pov').classList.remove('on');$('payOpen').focus()}
+$('payOpen').onclick=()=>{payUI();$('tabB').onclick();document.body.classList.add('pov-on');$('pov').classList.add('on');const pb=$('pov').querySelector('.pbox');pb.setAttribute('tabindex','-1');pb.focus()};
 $('pX').onclick=payClose;
 $('pov').onclick=e=>{if(e.target===$('pov'))payClose()};
 $('payAdd').onclick=()=>{PAY.add=!PAY.add;$('payAdd').textContent=PAY.add?'Расчёт добавлен в заявку ✓':'Добавить расчёт в заявку';draw()};
@@ -382,7 +446,7 @@ addEventListener('resize',fitStage);
 addEventListener('orientationchange',()=>setTimeout(fitStage,150));
 addEventListener('load',fitStage);
 
-resize();fitStage();add('a',5,2,200);add('f',10,6,650);st.sel=null;draw();
+resize();fitStage();add('d',5,2,200);add('f',10,6,650);st.sel=null;draw();
 </script></body></html>
 
 
