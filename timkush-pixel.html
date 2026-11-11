@@ -1,0 +1,388 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Собери свой кабинет — Timkush</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}:root{--bg:#1b1230;--pn:#2a1d4a;--pn2:#3a2a62;--ink:#fff;--y:#ffd93d;--pk:#ff6b9d;--mut:#b9a9e0;--ln:#0e0820}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 Inter,system-ui,sans-serif;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer}a{color:inherit;text-decoration:none}.px{font-family:'Press Start 2P',monospace}
+.top{display:flex;align-items:center;gap:18px;padding:14px clamp(14px,2vw,28px);flex-wrap:wrap;border-bottom:4px solid var(--ln)}
+.lg{font:12px 'Press Start 2P';color:var(--y)}.hl{font:clamp(13px,1.6vw,18px)/1.5 'Press Start 2P'}.hl em{color:var(--pk);font-style:normal}
+.mt{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
+.chip{background:var(--pn);border:3px solid var(--ln);box-shadow:0 4px 0 var(--ln);padding:6px 12px;min-width:118px}.chip small{display:block;color:var(--mut);font-size:11px}.chip b{font:13px 'Press Start 2P'}
+.bar{height:8px;background:#150d27;margin-top:6px}.bar i{display:block;height:100%;background:var(--y);width:0;transition:width .3s}
+.app{display:grid;grid-template-columns:290px 1fr 300px;gap:16px;padding:16px clamp(14px,2vw,28px);align-items:start}
+.pn{background:var(--pn);border:4px solid var(--ln);box-shadow:0 6px 0 var(--ln);padding:14px}.pn h2{font:10px/1.5 'Press Start 2P';color:var(--y);margin:0 0 12px}
+.rng{margin-bottom:12px}.rng label{display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px}input[type=range]{width:100%;accent-color:#ffd93d}
+.cat{display:flex;flex-direction:column;gap:8px}
+.cd{display:flex;align-items:center;gap:10px;background:var(--pn2);border:3px solid var(--ln);padding:6px 8px;text-align:left;width:100%;user-select:none;touch-action:pan-y;transition:transform .08s}
+.cd:hover,.cd:focus-visible{border-color:var(--y);outline:0;transform:translateY(-2px)}.cd canvas{width:84px;height:66px;image-rendering:pixelated;flex:none;background:#241a3f}.cd b{display:block;font-size:12px;line-height:1.25}.cd span{color:var(--y);font-weight:700;font-size:12px}
+.stage{background:#0b0716;border:4px solid var(--ln);box-shadow:0 6px 0 var(--ln);position:relative}
+#sc{width:100%;height:auto;display:block;image-rendering:pixelated;touch-action:none;user-select:none}
+.crt{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#0000 0 2px,#0000000d 2px 3px)}
+.hint{position:absolute;left:12px;top:10px;font:9px/1.6 'Press Start 2P';color:#e8dcff;text-shadow:2px 2px 0 #0b0716;max-width:55%;pointer-events:none}
+.tb{position:absolute;right:10px;top:10px;display:none;gap:8px}.tb button{width:44px;height:44px;border:3px solid var(--ln);background:var(--y);color:#1b1230;font:16px 'Press Start 2P';box-shadow:0 4px 0 var(--ln)}.tb button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ln)}
+.leg{padding:8px 12px;font-size:12px;color:var(--mut);background:var(--pn)}
+.it{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:2px dashed #4a3a78;font-size:13px}.it.on{color:var(--y)}.it span{flex:1;line-height:1.25}.it button{width:34px;height:34px;border:3px solid var(--ln);background:var(--pn2)}.it button:hover{background:var(--y);color:#1b1230}
+.em{color:var(--mut);font-size:13px;padding:8px 0}
+.tot{display:flex;justify-content:space-between;align-items:center;margin:14px 0 4px}.tot span{font:10px 'Press Start 2P'}.tot b{font:14px 'Press Start 2P';color:var(--y)}.sub{font-size:12px;color:var(--mut);margin-bottom:12px}
+.send{display:flex;flex-direction:column;gap:10px}.btn{display:flex;align-items:center;justify-content:center;min-height:48px;font:10px/1.4 'Press Start 2P';text-align:center;padding:6px 10px;border:3px solid var(--ln);background:var(--y);color:#1b1230;box-shadow:0 5px 0 var(--ln);width:100%}.btn.o{background:var(--pk)}.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ln)}.btn[disabled],.btn[aria-disabled="true"]{opacity:.4;pointer-events:none}
+.sm{font-size:12px;color:var(--mut);margin-top:10px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--y);color:#1b1230;border:3px solid var(--ln);padding:12px 18px;font:10px/1.5 'Press Start 2P';opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:92vw;text-align:center}#toast.on{opacity:1;transform:translate(-50%,0)}body.pov-on{overflow:hidden}
+/* мобильная версия: комната сверху по центру, каталог-карусель, цена снизу */
+@media(max-width:1100px){
+html{background:var(--bg)}
+body{display:flex;flex-direction:column;height:100vh;height:100svh;min-height:0;overflow:hidden auto}
+.top{flex:none;gap:6px;padding:8px 10px}
+.hl{font-size:11px;line-height:1.35}
+.mt{flex:1 1 100%;margin-left:0;gap:6px}
+.chip{flex:1;min-width:0;padding:4px 6px}
+.chip{overflow:hidden}.chip small{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chip b{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app{flex:1;min-height:0;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto auto;align-items:stretch;gap:6px;padding:8px 10px}
+.app>div{order:-1;min-height:0;display:flex;flex-direction:column;justify-content:stretch;align-items:center;--stgw:min(100%,460px)}
+.app>div .stage{width:var(--stgw);max-width:none;margin:0 auto;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#1b1230}
+.app>div #sc{width:calc(var(--z,1.25)*100%);flex:none}
+.app>div .hint{display:none}
+.app>div .leg{width:var(--stgw);max-width:var(--stgw);margin:0 auto;border:2px solid var(--ln);border-top:0;font-size:9px;line-height:1.3;padding:3px 8px}
+.app>aside.pn:first-of-type{order:0;align-self:start;max-height:100%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto auto auto auto;column-gap:8px;row-gap:4px;padding:8px 10px;min-height:0}
+.app>aside.pn:first-of-type>h2{grid-column:1/-1;margin:0 !important;font-size:9px;line-height:1.3}
+.app>aside.pn:first-of-type>.rng{margin:0}
+.app>aside.pn:first-of-type>.rng label{font-size:11px;margin:0}
+.app>aside.pn:first-of-type>.rng input{height:20px}
+.app>aside.pn:first-of-type>#cat{grid-column:1/-1;display:grid;grid-auto-flow:column;grid-auto-columns:clamp(130px,calc((100% - 8px)/2 - 6px),230px);touch-action:pan-x pan-y;align-items:start;gap:8px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 0 6px;scrollbar-width:thin;scrollbar-color:var(--y) #150d27}
+.app>aside.pn:first-of-type>#cat::-webkit-scrollbar{height:6px}
+.app>aside.pn:first-of-type>#cat::-webkit-scrollbar-track{background:#150d27}
+.app>aside.pn:first-of-type>#cat::-webkit-scrollbar-thumb{background:var(--y)}
+.app>aside.pn:first-of-type .cd{scroll-snap-align:start;align-items:center;gap:5px;padding:4px 5px;touch-action:auto}
+.app>aside.pn:first-of-type .cd>div{min-width:0;flex:1 1 auto;overflow:hidden}
+.app>aside.pn:first-of-type .cd canvas{width:44px;height:34px}
+.app>aside.pn:first-of-type .cd b{font-size:10px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.app>aside.pn:first-of-type .cd span{font-size:10px}
+.app>aside.pn:first-of-type>.sm{grid-column:1/-1;margin:0;font-size:9px}
+.app>aside.pn:last-of-type{order:1;display:flex;flex-direction:column;gap:4px;padding:8px 10px}
+.app>aside.pn:last-of-type>h2,.app>aside.pn:last-of-type>#list,.app>aside.pn:last-of-type>.sm{display:none}
+.app>aside.pn:last-of-type>.tot{margin:0}
+.app>aside.pn:last-of-type>.tot b{font-size:13px}
+.app>aside.pn:last-of-type>.sub{margin:0;font-size:9px}
+.app>aside.pn:last-of-type>.send{flex-direction:row;gap:6px}
+.app>aside.pn:last-of-type>.send>.btn{flex:1;min-height:44px;font-size:8px;padding:4px;box-shadow:0 3px 0 var(--ln)}
+#toast{bottom:132px}
+}
+@media(max-width:1100px) and (max-height:720px){
+.mt{display:none}
+.app>div .leg{display:none}
+.app>div{--stgw:min(100%,400px)}
+}
+@media(min-width:1101px){#paneB .pr{margin:3px 0 0}#paneB input[type=range]{height:16px}}
+/* телефон в горизонтали: обычная прокрутка страницы */
+@media(max-width:1100px) and (max-height:560px){
+html{background:var(--bg)}
+body{height:auto;overflow:visible}
+.app{grid-template-rows:auto;align-items:start}
+.app>div{--stgw:min(100%,320px)}
+.app>aside.pn:first-of-type{grid-template-rows:auto}
+}
+/* каталог: прокручивается список товаров, а не страница */
+@media(min-width:1101px){
+body{display:flex;flex-direction:column;height:100vh}
+.top{flex:none}
+.app{flex:1;min-height:0;align-items:start;grid-template-rows:minmax(0,1fr)}
+.app>aside.pn{align-self:start;max-height:100%;display:flex;flex-direction:column;min-height:0}
+.app>aside.pn #cat,.app>aside.pn #list{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 6px 2px 0;scrollbar-width:thin;scrollbar-color:var(--y) #150d27}
+.app>aside.pn #cat::-webkit-scrollbar,.app>aside.pn #list::-webkit-scrollbar{width:8px}
+.app>aside.pn #cat::-webkit-scrollbar-track,.app>aside.pn #list::-webkit-scrollbar-track{background:#150d27}
+.app>aside.pn #cat::-webkit-scrollbar-thumb,.app>aside.pn #list::-webkit-scrollbar-thumb{background:var(--y);border:2px solid #150d27}
+}
+
+/* калькулятор окупаемости */
+.lnk{display:block;width:100%;margin:0 0 6px;min-height:44px;background:none;border:0;padding:8px 0;color:var(--y);font:9px/1.5 'Press Start 2P',monospace;text-align:left;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.lnk:hover{color:var(--ink)}
+.pov{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:12px;background:#0b0716e6}
+.pov.on{display:flex}
+.pbox{position:relative;width:100%;max-width:430px;max-height:calc(100vh - 24px);max-height:calc(100svh - 24px);display:flex;flex-direction:column;overflow:hidden;background:var(--pn);border:4px solid var(--ln);box-shadow:0 8px 0 var(--ln);padding:14px}
+.pbody{overflow-y:auto;overscroll-behavior:contain;min-height:0;min-width:0;flex:1;padding-right:12px;scrollbar-width:thin;scrollbar-color:var(--y) #150d27}
+.pbody::-webkit-scrollbar{width:8px}.pbody::-webkit-scrollbar-track{background:#150d27}.pbody::-webkit-scrollbar-thumb{background:var(--y)}
+.pbox h2{font:10px/1.5 'Press Start 2P',monospace;color:var(--y);margin:0 0 10px;padding-right:36px}
+.pclose{position:absolute;right:6px;top:6px;width:44px;height:44px;border:3px solid var(--ln);background:var(--pn2);color:var(--ink);font:12px/1 'Press Start 2P',monospace;cursor:pointer}
+.pclose:hover{background:var(--y);color:#1b1230}
+.pr{display:flex;justify-content:space-between;gap:8px;margin:6px 0 0;font-size:11px;font-weight:700}
+.pr b{color:var(--y);white-space:nowrap}
+.pov input[type=range]{width:100%;height:18px;margin:0 0 2px;accent-color:var(--y)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.pgrid>div{background:var(--pn2);border:3px solid var(--ln);padding:5px 7px}
+.pgrid small{display:block;font-size:10px;color:var(--mut)}
+.pgrid b{display:block;margin-top:3px;font:9px/1.4 'Press Start 2P',monospace;color:var(--y)}
+.pver{background:#150d27;border:3px solid var(--ln);padding:8px 10px;font-size:12px;line-height:1.45;margin-bottom:10px}
+.pver b{color:var(--y)}
+#pch{display:block;width:100%;height:auto;image-rendering:pixelated;background:#150d27;border:3px solid var(--ln)}
+.pcta{flex:none;margin-top:8px}
+.pcap{font-size:11px;color:var(--mut);margin:6px 0 10px;line-height:1.4}
+.tabs{display:flex;gap:6px;margin:0 0 10px}
+.tab{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:6px 4px;border:3px solid var(--ln);background:var(--pn2);color:var(--mut);font:8px/1.3 'Press Start 2P',monospace;cursor:pointer}
+.tab.on{background:var(--y);color:#1b1230}
+.pane{display:none}
+.pane.on{display:block}
+.pnote{font-size:10px;color:var(--mut);margin:0 0 6px;line-height:1.4}
+.cmp{width:100%;table-layout:fixed;border-collapse:collapse;margin:8px 0;font-size:11px}
+.cmp th,.cmp td{border:2px solid var(--ln);padding:3px 6px;text-align:right;vertical-align:top}
+.cmp th:first-child,.cmp td:first-child{text-align:left;color:var(--mut);font-weight:400;width:44%}
+.cmp thead th{background:var(--pn2);color:var(--y);font:8px/1.3 'Press Start 2P',monospace;text-align:center}
+.cmp tbody tr:last-child td{background:#150d27;font-weight:700}
+.cmp tbody tr:last-child td:last-child{color:#6fe08a}
+
+</style></head><body>
+<div class="top"><span class="lg">TIMKUSH</span><div class="hl">Соберите свой <em>кабинет</em></div>
+<div class="mt"><div class="chip"><small>Комната</small><b id="mA">12 м²</b></div><div class="chip"><small>Занято <span id="mH" style="color:var(--y)"></span></small><b id="mP">0%</b><div class="bar"><i id="mB"></i></div></div><div class="chip"><small>Бюджет</small><b id="mS">0 ₽</b></div></div></div>
+<div class="app">
+<aside class="pn"><h2>РАЗМЕР КОМНАТЫ</h2>
+<div class="rng"><label for="rw">Ширина <span id="vw"></span></label><input id="rw" type="range" min="2" max="8" step=".5" value="4"></div>
+<div class="rng"><label for="rd">Глубина <span id="vd"></span></label><input id="rd" type="range" min="2" max="8" step=".5" value="3"></div>
+<h2 style="margin-top:20px">КАТАЛОГ</h2><div class="cat" id="cat"></div>
+<div class="sm">Нажмите на мебель или перетащите её в комнату.</div></aside>
+<div><div class="stage"><div class="hint" id="hint">Двигайте мебель мышью. R — повернуть, Del — убрать.</div>
+<div class="tb" id="tb"><button type="button" id="tbl" aria-label="Повернуть влево" title="Влево">↺</button><button type="button" id="tbr" aria-label="Повернуть вправо" title="Вправо">↻</button><button type="button" id="tbd" aria-label="Убрать" title="Убрать">✕</button></div>
+<canvas id="sc" width="320" height="224" role="img" tabindex="0" aria-label="Пиксельная схема кабинета"></canvas><div class="crt"></div></div>
+<div class="leg">Внешний вид и габариты мебели условные, точные размеры уточним по каталогу.</div></div>
+<aside class="pn"><h2>ВАШ КАБИНЕТ</h2><div id="list"></div>
+<div class="tot"><span>ИТОГО</span><b id="tS">0 ₽</b></div><div class="sub" id="tN">цены «от», расчёт до заказа</div>
+<button class="lnk" id="payOpen" type="button">Посчитать окупаемость →</button>
+<div class="send"><a class="btn" id="wa" href="#" target="_blank" rel="noopener">Отправить в WhatsApp</a><button class="btn o" id="tg" type="button">Скопировать и открыть Telegram</button></div>
+<div class="sm">Имя и телефон не нужны: весь список уйдёт одним сообщением.</div></aside></div>
+<div class="pov" id="pov" role="dialog" aria-modal="true" aria-labelledby="pT">
+<div class="pbox"><button class="pclose" id="pX" type="button" aria-label="Закрыть">✕</button>
+<h2 id="pT">ЭКОНОМИКА КАБИНЕТА</h2>
+<div class="tabs"><button class="tab on" id="tabA" type="button">Окупаемость</button><button class="tab" id="tabB" type="button">Дешёвое vs Timkush</button></div>
+<div class="pbody"><div class="pane on" id="paneA">
+<div class="pgrid"><div><small>Выручка в месяц</small><b id="q1"></b></div><div><small>Расходы в месяц</small><b id="q2"></b></div><div><small>Прибыль в месяц</small><b id="q3"></b></div><div><small>Оборудование</small><b id="q4"></b></div></div>
+<div class="pver" id="q5"></div>
+<canvas id="pch" width="320" height="120" aria-label="График накопленной прибыли и стоимости оборудования"></canvas>
+<div class="pcap" id="pcap"></div>
+<div class="pcap">Ползунки — вводные расчёта</div>
+<div class="pr"><label for="p1">Аренда места, ₽/мес</label><b id="p1v"></b></div><input id="p1" type="range" min="0" max="150000" step="1000" value="35000">
+<div class="pr"><label for="p2">Средний чек, ₽</label><b id="p2v"></b></div><input id="p2" type="range" min="500" max="20000" step="100" value="4500">
+<div class="pr"><label for="p3">Клиентов в день</label><b id="p3v"></b></div><input id="p3" type="range" min="1" max="12" step="1" value="4">
+<div class="pr"><label for="p4">Рабочих дней в месяце</label><b id="p4v"></b></div><input id="p4" type="range" min="8" max="31" step="1" value="22">
+<div class="pr"><label for="p5">Расходники на клиента, ₽</label><b id="p5v"></b></div><input id="p5" type="range" min="0" max="3000" step="10" value="120">
+<div class="pr"><label for="p6">Налог и эквайринг, %</label><b id="p6v"></b></div><input id="p6" type="range" min="0" max="15" step="1" value="6">
+<div class="pr"><label for="p7">Реклама и прочее, ₽/мес</label><b id="p7v"></b></div><input id="p7" type="range" min="0" max="100000" step="1000" value="15000">
+</div>
+<div class="pane" id="paneB">
+<p class="pnote">Сравнение за 3 года: таблица пересчитывается ползунками ниже. Чек, клиенты, дни, аренда и расходники — из вкладки «Окупаемость».</p>
+<table class="cmp"><thead><tr><th></th><th>Обычное</th><th>Timkush</th></tr></thead><tbody id="cmpBody"></tbody></table>
+<div class="pver" id="cver"></div>
+<div class="pcap">Ползунки — что подставить в сравнение</div>
+<div class="pr"><label for="c1">Цена обычного кресла, ₽</label><b id="c1v"></b></div><input id="c1" type="range" min="5000" max="60000" step="1000" value="20000">
+<div class="pr"><label for="c2">Срок службы обычного, лет</label><b id="c2v"></b></div><input id="c2" type="range" min="1" max="6" step="0.5" value="2">
+<div class="pr"><label for="c3">Ремонт обычного, ₽/год</label><b id="c3v"></b></div><input id="c3" type="range" min="0" max="30000" step="1000" value="6000">
+<div class="pr"><label for="c4">Простой из-за ремонта и замены, дн./год</label><b id="c4v"></b></div><input id="c4" type="range" min="0" max="30" step="1" value="8">
+<div class="pr"><label for="c5">Срок службы Timkush, лет</label><b id="c5v"></b></div><input id="c5" type="range" min="3" max="12" step="1" value="6">
+<div class="pr"><label for="c6">Надбавка к чеку за премиум, %</label><b id="c6v"></b></div><input id="c6" type="range" min="0" max="40" step="1" value="15">
+</div>
+</div><button class="btn o pcta" id="payAdd" type="button">Добавить расчёт в заявку</button>
+</div></div>
+<div id="toast" role="status"></div>
+<script>
+const $=i=>document.getElementById(i),CELL=.25,CW=320,CH=224,WH=9;
+const SP=[
+{id:'a',n:'Кресло MR KUSH MZ 3563 гидравлическое',p:31900,t:'chair',c:'#f3e6d4'},
+{id:'b',n:'Кресло MR KUSH MZ 3585-3 с электроприводом',p:59900,t:'chair',c:'#f4b6c6'},
+{id:'c',n:'Кресло MR KUSH MZ 3589 с электроприводом',p:79900,t:'chair',c:'#ffa94d'},
+{id:'d',n:'Кресло MR KUSH Morley с электроприводом',p:139000,t:'chair',c:'#c2305a'},
+{id:'e',n:'Стул мастера',p:null,t:'stool',c:'#7dd3fc'},
+{id:'f',n:'Тележка',p:null,t:'cart',c:'#c4f1be'},
+{id:'g',n:'Тумба',p:null,t:'cab',c:'#fff1b8'}];
+const DIM={chair:[3,8],stool:[2,2],cart:[2,3],cab:[3,2]};
+const PT={
+chair:[['g',.7,2.6,1.6,3.2,0,.7],['l',1.1,3.4,.8,1.6,.7,1.7],['g',0,1.8,3,4.2,2.4,.5],['g',0,6,3,2,2.2,.4],['m',0,.2,3,1.7,2.9,.8],['m',0,.1,3,.9,3.7,.8],['m',.5,0,2,.8,4.5,.5],['m',0,1.9,3,4.1,2.9,.5],['m',0,6,3,2,2.6,.4]],
+stool:[['g',.4,.4,1.2,1.2,0,.2],['l',.85,.85,.3,.3,.2,1.5],['m',.1,.1,1.8,1.8,1.7,.5]],
+cart:[['l',0,0,.15,.15,0,2.6],['l',1.85,0,.15,.15,0,2.6],['m',0,0,2,3,.5,.12],['m',0,0,2,3,1.4,.12],['m',0,0,2,3,2.3,.12],['l',0,2.85,.15,.15,0,2.6],['l',1.85,2.85,.15,.15,0,2.6]],
+cab:[['m',0,0,3,2,0,2.2],['l',-.1,-.1,3.2,2.2,2.2,.15],['d',.4,2,.5,.06,1.3,.15],['d',2.1,2,.5,.06,1.3,.15]]};
+const PLANT=[['p',.2,.2,1.6,1.6,0,1.1],['n',0,0,2,2,1.1,.9],['q',.2,.2,1.6,1.6,2,.8],['n',.55,.55,.9,.9,2.8,.7]];
+const PAL=s=>({m:s,g:'#a898c8',l:'#dfe3f0',d:'#2a2236',p:'#d9743f',n:'#3fae52',q:'#6fd36f'});
+const st={w:4,d:3,items:[],sel:null,uid:1};
+const fmt=n=>n.toLocaleString('ru-RU')+' ₽';
+const pk=(r,g,b)=>((255<<24)|(b<<16)|(g<<8)|r)>>>0,hx=h=>{const n=parseInt(h.slice(1),16);return[n>>16,(n>>8)&255,n&255]};
+const col=(h,f,bad)=>{let[r,g,b]=hx(h);if(bad){r=(r+255)>>1;g>>=1;b>>=1}return pk(Math.min(255,r*f|0),Math.min(255,g*f|0),Math.min(255,b*f|0))};
+const dk=(c,f)=>pk((c&255)*f|0,((c>>8)&255)*f|0,((c>>16)&255)*f|0);
+class Ras{constructor(w,h){this.w=w;this.h=h;this.c=new Uint32Array(w*h);this.i=new Uint16Array(w*h)}
+scan(p,fn){let y0=1e9,y1=-1e9;for(const q of p){if(q[1]<y0)y0=q[1];if(q[1]>y1)y1=q[1]}const n=p.length,ya=Math.max(0,Math.ceil(y0-.5)),yb=Math.min(this.h-1,Math.floor(y1-.5));
+for(let y=ya;y<=yb;y++){const yc=y+.5,xs=[];for(let k=0;k<n;k++){const a=p[k],b=p[(k+1)%n];if((a[1]<=yc&&yc<b[1])||(b[1]<=yc&&yc<a[1]))xs.push(a[0]+(yc-a[1])*(b[0]-a[0])/(b[1]-a[1]))}
+if(xs.length<2)continue;xs.sort((a,b)=>a-b);const xa=Math.max(0,Math.round(xs[0])),xb=Math.min(this.w-1,Math.round(xs[xs.length-1])-1);for(let x=xa;x<=xb;x++)fn(y*this.w+x)}}
+quad(p,c,id=0){this.scan(p,j=>{this.c[j]=c;this.i[j]=id})}
+shade(p,f){this.scan(p,j=>{this.c[j]=dk(this.c[j],f)})}
+mix(p,rgb,a){this.scan(p,j=>{const c=this.c[j];this.c[j]=pk((c&255)*(1-a)+rgb[0]*a|0,((c>>8)&255)*(1-a)+rgb[1]*a|0,((c>>16)&255)*(1-a)+rgb[2]*a|0)})}}
+const G={t:8,zk:8.8,ox:0,oy:0};const W=()=>st.w/CELL,D=()=>st.d/CELL;
+const P=(x,y,z=0)=>[G.ox+(x-y)*G.t,G.oy+(x+y)*G.t/2-z*G.zk];
+function geo(){const w=W(),d=D();let t=4;for(const tt of[8,6,4])if((w+d)*tt<=CW-16&&(w+d)*tt/2+WH*tt*1.1<=CH-12){t=tt;break}
+G.t=t;G.zk=t*1.1;G.ox=Math.round(d*t+(CW-(w+d)*t)/2);const H=(w+d)*t/2+WH*G.zk;G.oy=Math.round((CH-H)/2+WH*G.zk)}
+function order(L){const n=L.length,v=Array(n).fill(0),out=[],sx=(a,b)=>a.x+a.w<=b.x,sy=(a,b)=>a.y+a.d<=b.y;
+const bh=(a,b)=>{if(a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.d&&b.y<a.y+a.d)return a.z<b.z;const ab=sx(a,b)||sy(a,b),ba=sx(b,a)||sy(b,a);return ab&&!ba};
+const vis=i=>{if(v[i])return;v[i]=1;for(let j=0;j<n;j++)if(j!==i&&bh(L[j],L[i]))vis(j);out.push(L[i])};L.forEach((_,i)=>vis(i));return out}
+const sp=it=>SP.find(s=>s.id===it.s),dims=it=>{const[a,b]=DIM[sp(it).t];return it.r&1?[b,a]:[a,b]};
+function rparts(t,r){return order(PT[t].map(([k,x0,y0,w0,d0,z,h])=>{let x=x0,y=y0,w=w0,d=d0,[fw,fd]=DIM[t];for(let i=0;i<r;i++){const nx=y,ny=fw-x-w;x=nx;y=ny;[w,d]=[d,w];[fw,fd]=[fd,fw]}return{k,x,y,w,d,z,h}}))}
+function parts(R,L,pal,id,ox,oy,dz,bad){for(const q of L){const c=pal[q.k],x=q.x+ox,y=q.y+oy,z=q.z+dz,{w,d,h}=q;
+R.quad([P(x,y+d,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x,y+d,z+h)],col(c,.82,bad),id);
+R.quad([P(x+w,y,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x+w,y,z+h)],col(c,.6,bad),id);
+R.quad([P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)],col(c,1.1,bad),id)}}
+const plant=()=>({x:W()-2,y:0,w:2,d:2});
+const ov=(a,b)=>a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.d&&b.y<a.y+a.d;
+const rect=it=>{const[w,d]=dims(it);return{x:it.x,y:it.y,w,d}};
+const inside=it=>{const r=rect(it);return r.x>=0&&r.y>=0&&r.x+r.w<=W()&&r.y+r.d<=D()};
+const ok=it=>inside(it)&&!ov(rect(it),plant())&&!st.items.some(o=>o!==it&&ov(rect(it),rect(o)));
+function free(it){for(let y=0;y<=D();y++)for(let x=0;x<=W();x++){it.x=x;it.y=y;if(ok(it))return true}return false}
+const GL={T:['111','010','010','010','010'],I:['111','010','010','010','111'],M:['101','111','111','101','101'],K:['101','101','110','101','101'],U:['101','101','101','101','111'],S:['111','100','111','001','111'],H:['101','111','111','101','101']};
+function scene(R,bg){const w=W(),d=D(),now=performance.now();
+const rr=R.w*R.h;for(let j=0;j<rr;j++){R.c[j]=bg;R.i[j]=0}
+// floor edge
+R.quad([P(0,d,0),P(w,d,0),P(w,d,-.9),P(0,d,-.9)],pk(150,98,62),1);R.quad([P(w,0,0),P(w,d,0),P(w,d,-.9),P(w,0,-.9)],pk(112,72,46),1);
+for(let x=0;x<w;x+=4)for(let y=0;y<d;y+=4){const x2=Math.min(w,x+4),y2=Math.min(d,y+4);R.quad([P(x,y),P(x2,y),P(x2,y2),P(x,y2)],((x+y)/4&1)?pk(244,226,196):pk(233,208,172),1)}
+const rx=Math.floor(w*.22),rw=Math.floor(w*.5),ry=Math.floor(d*.4),rd=Math.floor(d*.5);if(w>=12&&d>=12){R.quad([P(rx,ry),P(rx+rw,ry),P(rx+rw,ry+rd),P(rx,ry+rd)],pk(240,150,176),1);R.quad([P(rx+1,ry+1),P(rx+rw-1,ry+1),P(rx+rw-1,ry+rd-1),P(rx+1,ry+rd-1)],pk(250,184,204),1)}
+// walls
+const wall=(f,c1,c2,base)=>{const L=f==='b'?w:d,pt=(u,z)=>f==='b'?P(u,0,z):P(0,u,z);R.quad([pt(0,0),pt(L,0),pt(L,WH),pt(0,WH)],c1,2);
+for(let u=0;u<L;u+=2)R.quad([pt(u,.9),pt(u+1,.9),pt(u+1,WH),pt(u,WH)],c2,2);R.quad([pt(0,0),pt(L,0),pt(L,.9),pt(0,.9)],base,2);return pt};
+const pb=wall('b',pk(250,214,196),pk(246,203,182),pk(190,128,110)),pl=wall('l',pk(232,176,196),pk(224,162,184),pk(160,98,120));
+const wx=Math.max(2,Math.round(w/2-3));R.quad([pb(wx-.6,3.6),pb(wx+6.6,3.6),pb(wx+6.6,8.4),pb(wx-.6,8.4)],pk(255,244,230),2);R.quad([pb(wx,4.2),pb(wx+6,4.2),pb(wx+6,7.8),pb(wx,7.8)],pk(142,208,250),2);
+R.quad([pb(wx,4.2),pb(wx+6,4.2),pb(wx+6,5.4),pb(wx,5.4)],pk(176,226,255),2);R.quad([pb(wx+2.8,4.2),pb(wx+3.2,4.2),pb(wx+3.2,7.8),pb(wx+2.8,7.8)],pk(255,244,230),2);R.quad([pb(wx,5.8),pb(wx+6,5.8),pb(wx+6,6.2),pb(wx,6.2)],pk(255,244,230),2);
+if(Math.floor(now/700)%2)R.quad([pb(wx+4.2,6.6),pb(wx+4.9,6.6),pb(wx+4.9,7.3),pb(wx+4.2,7.3)],pk(255,255,255),2);
+const dy=Math.max(1,Math.round(d/2-1.5));R.quad([pl(dy-.4,0),pl(dy+3.4,0),pl(dy+3.4,8.4),pl(dy-.4,8.4)],pk(255,244,230),2);R.quad([pl(dy,0),pl(dy+3,0),pl(dy+3,8),pl(dy,8)],pk(176,112,70),2);R.quad([pl(dy+.4,3.2),pl(dy+2.6,3.2),pl(dy+2.6,7.4),pl(dy+.4,7.4)],pk(150,92,56),2);R.quad([pl(dy+2.2,3.8),pl(dy+2.5,3.8),pl(dy+2.5,4.3),pl(dy+2.2,4.3)],pk(255,217,61),2);
+const s=Math.min(.5,(w-6)/27);if(s>=.25){const sw=27*s,u0=(w-sw)/2,z0=wx<u0+sw&&wx+6>u0?WH-1.3:WH-1.3;let u=u0;const px=(u,r,c,z=.5)=>R.quad([pb(u,z0-(r+1)*s),pb(u+s,z0-(r+1)*s),pb(u+s,z0-r*s),pb(u,z0-r*s)],c,2);
+// sign sits above window row
+for(const ch of'TIMKUSH'){const g=GL[ch];for(let r=0;r<5;r++)for(let c=0;c<3;c++)if(g[r][c]==='1')px(u+c*s,r,pk(95,58,120));u+=4*s}}
+// frame on left wall
+const fy=Math.max(d-6,dy+5);if(fy+3<d-1){R.quad([pl(fy,4),pl(fy+3,4),pl(fy+3,7.4),pl(fy,7.4)],pk(255,244,230),2);R.quad([pl(fy+.3,4.3),pl(fy+2.7,4.3),pl(fy+2.7,7.1),pl(fy+.3,7.1)],pk(255,217,61),2);R.quad([pl(fy+.9,4.9),pl(fy+2.1,4.9),pl(fy+2.1,6.5),pl(fy+.9,6.5)],pk(255,107,157),2)}
+// shadows + selection
+const sel=st.items.find(i=>i.id===st.sel);
+for(const it of st.items){if(now<it.t0)continue;const r=rect(it);R.shade([P(r.x,r.y),P(r.x+r.w,r.y),P(r.x+r.w,r.y+r.d),P(r.x,r.y+r.d)],.8)}
+if(sel&&now>=sel.t0){const r=rect(sel);R.mix([P(r.x,r.y),P(r.x+r.w,r.y),P(r.x+r.w,r.y+r.d),P(r.x,r.y+r.d)],sel.bad?[255,70,70]:[255,217,61],sel.bad?.6:.5)}
+const pp=plant();parts(R,order(PLANT.map(([k,x,y,w,d,z,h])=>({k,x,y,w,d,z,h}))),PAL('#000'),4000<<4,pp.x,pp.y,0,0)}
+function items(R){const now=performance.now(),L=order(st.items.filter(i=>now>=i.t0).map(i=>Object.assign({it:i,z:0},rect(i))));st.order={};
+L.forEach((q,k)=>{const it=q.it,e=(now-it.t0)/520,dz=e<1?7*(1-e)*Math.abs(Math.cos(e*Math.PI*2.5)):0;st.order[it.id]=k;const s=sp(it);parts(R,rparts(s.t,it.r),PAL(s.c),it.id<<4,it.x,it.y,dz,it.bad)})}
+function outline(R,selId,blink){const{w,h}=R,src=R.i.slice(),c=R.c,L=pk(255,217,61),K=pk(30,16,40);
+for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x,v=src[i];const nb=[x>0?src[i-1]:0,x<w-1?src[i+1]:0,y>0?src[i-w]:0,y<h-1?src[i+w]:0];
+if(v<16){let o=0,hit=0;for(const n of nb){if(n>=16){o=n;if((n>>4)===selId)hit=1}}
+if(o)c[i]=hit&&blink?L:K;else if(v===0){for(const n of nb)if(n>0&&n<16){c[i]=K;break}}}
+else{for(const n of nb)if(n>=16&&(n>>4)!==(v>>4)&&(st.order&&(st.order[n>>4]??-1)>(st.order[v>>4]??-1))){c[i]=dk(c[i],.55);break}}}}
+const cv=$('sc'),ctx=cv.getContext('2d'),Rm=new Ras(CW,CH),BG=pk(27,18,48);let raf=0,blink=0;
+function render(){geo();scene(Rm,BG);items(Rm);outline(Rm,st.sel,blink);ctx.putImageData(new ImageData(new Uint8ClampedArray(Rm.c.buffer),CW,CH),0,0)}
+function draw(){render();const now=performance.now();if(!raf&&st.items.some(i=>now<i.t0+540)){raf=requestAnimationFrame(()=>{raf=0;draw()})}
+$('tb').style.display=st.items.some(i=>i.id===st.sel)?'flex':'none';stats();list()}
+setInterval(()=>{blink^=1;render()},420);
+function stats(){const A=st.w*st.d;let occ=0,sum=0,np=0;st.items.forEach(it=>{const r=rect(it);occ+=r.w*r.d*CELL*CELL;const p=sp(it).p;p?sum+=p:np++});
+const pc=Math.round(occ/A*100);$('mA').textContent=(+A.toFixed(1))+' м²';$('mP').textContent=pc+'%';$('mB').style.width=Math.min(100,pc)+'%';$('mB').style.background=pc>70?'#ff6b6b':pc>45?'#ffd93d':'#6fe08a';
+$('mH').textContent=pc>70?'· тесновато':pc>45?'· почти заполнено':st.items.length?'· место есть':'';
+$('mS').textContent=fmt(sum);$('tS').textContent=fmt(sum);$('tN').textContent=np?`цены «от» + ещё ${np} ${plural(np,'позиция','позиции','позиций')} по запросу`:'цены «от», расчёт до заказа';
+$('wa').href='https://wa.me/79288040422?text='+encodeURIComponent(msg());const noItems=!st.items.length;$('wa').toggleAttribute('aria-disabled',noItems);$('wa').tabIndex=noItems?-1:0;$('tg').disabled=noItems}
+function list(){const l=$('list');l.innerHTML='';if(!st.items.length){l.innerHTML='<div class="em">Пока пусто. Добавьте мебель из каталога.</div>';return}
+st.items.forEach(it=>{const s=sp(it),r=document.createElement('div');r.className='it'+(st.sel===it.id?' on':'');
+r.innerHTML=`<span>${s.n}<br><small style="color:var(--mut)">${s.p?'от '+fmt(s.p):'цена по запросу'}</small></span><button aria-label="Повернуть влево" title="Влево">↺</button><button aria-label="Повернуть вправо" title="Вправо">↻</button><button aria-label="Убрать" title="Убрать">✕</button>`;
+r.querySelector('span').onclick=()=>{st.sel=it.id;draw()};const[b0,b1,b2]=r.querySelectorAll('button');b0.onclick=()=>rot(it,-1);b1.onclick=()=>rot(it,1);b2.onclick=()=>del(it);l.appendChild(r)})}
+function msg(){const cnt={};st.items.forEach(i=>cnt[i.s]=(cnt[i.s]||0)+1);let sum=0,np=0,n=0;
+const L=Object.keys(cnt).map(k=>{const s=SP.find(q=>q.id===k),c=cnt[k];s.p?sum+=s.p*c:np+=c;return`${++n}. ${s.n} × ${c} — ${s.p?'от '+fmt(s.p*c):'цена по запросу'}`});
+return`Здравствуйте! Собрал кабинет на timkush.ru.\nКомната: ${st.w} × ${st.d} м (${+(st.w*st.d).toFixed(1)} м²).\n${L.join('\n')}\nИтого по позициям с ценой: от ${fmt(sum)}${np?` (+ ${np} шт. по запросу)`:''}.${payBlock()}\nПрошу рассчитать стоимость и доставку.`}
+function add(sid,x,y,delay=0){const it={id:st.uid++,s:sid,x:x??0,y:y??0,r:0,t0:performance.now()+delay};if(x==null){let f=false;for(let r=0;r<4&&!f;r++){it.r=r;f=free(it)}if(!f){toast('В комнате нет места — увеличьте размер');return null}}st.items.push(it);st.sel=it.id;return it}
+function del(it){st.items=st.items.filter(i=>i!==it);if(st.sel===it.id)st.sel=null;draw()}
+function rot(it,dir=1){const o={x:it.x,y:it.y,r:it.r},[w0,d0]=dims(it);it.r=(it.r+dir+4)&3;const[w,d]=dims(it);it.x=Math.max(0,Math.min(Math.round(it.x+(w0-w)/2),W()-w));it.y=Math.max(0,Math.min(Math.round(it.y+(d0-d)/2),D()-d));if(!ok(it)&&!free(it)){Object.assign(it,o);toast('Нет места для поворота')}draw()}
+function pos(ev){const r=cv.getBoundingClientRect(),fx=(ev.clientX-r.left)/r.width*CW,fy=(ev.clientY-r.top)/r.height*CH;return[fx,fy]}
+function cell(ev){const[fx,fy]=pos(ev),a=(fx-G.ox)/G.t,b=2*(fy-G.oy)/G.t;return[(a+b)/2,(b-a)/2]}
+function hit(ev){const[fx,fy]=pos(ev),x=Math.floor(fx),y=Math.floor(fy);if(x<0||y<0||x>=CW||y>=CH)return null;const v=Rm.i[y*CW+x];return v>=16&&v<64000?st.items.find(i=>i.id===v>>4):null}
+let dr=null;
+cv.addEventListener('pointerdown',ev=>{const it=hit(ev);if(!it){st.sel=null;draw();return}ev.preventDefault();st.sel=it.id;const[cx,cy]=cell(ev);dr={it,ox:cx-it.x,oy:cy-it.y,px:it.x,py:it.y};draw();bindDrag()});
+cv.addEventListener('pointermove',ev=>{if(!dr)cv.style.cursor=hit(ev)?'grab':'default'});
+function bindDrag(){const mv=ev=>{if(!dr)return;const[cx,cy]=cell(ev),it=dr.it,[w,d]=dims(it);it.x=Math.max(0,Math.min(W()-w,Math.round(cx-dr.ox)));it.y=Math.max(0,Math.min(D()-d,Math.round(cy-dr.oy)));it.bad=!ok(it);draw()};
+const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);if(!dr)return;const it=dr.it;if(it.bad){if(dr.fresh&&!free(it)){st.items=st.items.filter(i=>i!==it);st.sel=null;toast('Здесь нет места')}else if(!dr.fresh){it.x=dr.px;it.y=dr.py}}it.bad=false;dr=null;draw()};
+addEventListener('pointermove',mv);addEventListener('pointerup',up)}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),2600)}
+// catalog icons
+function sprite(s){const c=document.createElement('canvas');c.width=56;c.height=44;const R=new Ras(56,44),sv=Object.assign({},G),[w,d]=DIM[s.t];
+G.t=4;G.zk=4.4;G.ox=Math.round(d*4+(56-(w+d)*4)/2);G.oy=Math.round(44-(w+d)*2-3);
+R.c.fill(pk(36,26,63));R.quad([P(0,0),P(w,0),P(w,d),P(0,d)],pk(0,0,0),0);R.shade([P(-.5,-.5),P(w+.5,-.5),P(w+.5,d+.5),P(-.5,d+.5)],1);
+parts(R,rparts(s.t,0),PAL(s.c),16,0,0,0,0);outline(R,0,0);Object.assign(G,sv);c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(R.c.buffer),56,44),0,0);return c}
+const cat=$('cat');SP.forEach(s=>{const b=document.createElement('button');b.className='cd';b.type='button';b.append(sprite(s));
+const dv=document.createElement('div');dv.innerHTML=`<b>${s.n}</b><span>${s.p?'от '+fmt(s.p):'цена по запросу'}</span>`;b.append(dv);
+let sx,sy,pid,moved=false,drag=false;
+b.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;moved=false;drag=false;pid=e.pointerType});
+b.addEventListener('pointermove',e=>{if(e.buttons!==1||drag||pid==='touch')return;if(Math.hypot(e.clientX-sx,e.clientY-sy)>6){drag=true;moved=true;const[cx,cy]=cell(e),it=add(s.id,Math.round(cx),Math.round(cy));if(it){const[w,d]=dims(it);it.x=Math.max(0,Math.min(W()-w,it.x-Math.floor(w/2)));it.y=Math.max(0,Math.min(D()-d,it.y-Math.floor(d/2)));it.bad=!ok(it);dr={it,ox:w/2,oy:d/2,px:it.x,py:it.y,fresh:true};draw();bindDrag()}}});
+b.addEventListener('click',()=>{if(moved){moved=false;return}if(add(s.id))draw()});cat.appendChild(b)});
+function resize(){st.w=+$('rw').value;st.d=+$('rd').value;$('vw').textContent=st.w+' м';$('vd').textContent=st.d+' м';const rem=[];
+st.items.forEach(it=>{const[w,d]=dims(it);it.x=Math.max(0,Math.min(it.x,W()-w));it.y=Math.max(0,Math.min(it.y,D()-d))});
+st.items.forEach(it=>{if(!ok(it)&&!free(it))rem.push(it)});if(rem.length){st.items=st.items.filter(i=>!rem.includes(i));toast('Часть мебели не поместилась и убрана')}draw();fitStage()}
+$('rw').oninput=$('rd').oninput=resize;
+$('tg').onclick=async()=>{const m=msg();const win=open('https://t.me/Asia_mr_kush05','_blank');try{await navigator.clipboard.writeText(m)}catch(e){const t=document.createElement('textarea');t.value=m;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}toast('Текст скопирован — вставьте его в чат Telegram');if(!win)toast('Откройте чат вручную: t.me/Asia_mr_kush05')};
+const cur=()=>st.items.find(i=>i.id===st.sel);
+$('tbl').onclick=()=>{const i=cur();i&&rot(i,-1)};$('tbr').onclick=()=>{const i=cur();i&&rot(i,1)};$('tbd').onclick=()=>{const i=cur();i&&del(i)};
+addEventListener('keydown',e=>{if($('pov').classList.contains('on'))return;const it=cur();if(!it||/INPUT/.test(e.target.tagName))return;
+if('rкRК'.includes(e.key))rot(it,e.shiftKey?-1:1);else if(e.key==='Delete'||e.key==='Backspace')del(it);
+else{const m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(m){e.preventDefault();const o=[it.x,it.y];it.x+=m[0];it.y+=m[1];if(!ok(it)){it.x=o[0];it.y=o[1]}draw()}}});
+// --- калькулятор окупаемости ---
+const PAY={rent:45000,check:3500,cl:3,days:22,cons:120,tax:6,ads:15000,add:false};
+const plural=(n,a,b,c)=>n%10===1&&n%100!==11?a:(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))?b:c;
+const paySum=()=>st.items.reduce((s,i)=>s+(sp(i).p||0),0);
+function payCalc(){const eq=paySum(),rev=PAY.check*PAY.cl*PAY.days,cons=PAY.cons*PAY.cl*PAY.days,tax=Math.round(rev*PAY.tax/100),cost=PAY.rent+cons+tax+PAY.ads,profit=rev-cost,per=PAY.check*(1-PAY.tax/100)-PAY.cons;return{eq,rev,cons,tax,cost,profit,per,be:per>0?Math.ceil((PAY.rent+PAY.ads)/PAY.days/per):0,payback:profit>0?eq/profit:0}}
+function payBlock(){if(!PAY.add)return'';const c=payCalc();if(!c.eq)return'';const tail=c.profit>0?`оборудование ${fmt(c.eq)} окупится за ${Math.ceil(c.payback)} мес.`:`при таких вводных не окупается (${fmt(c.profit)}/мес).`;return`\nОкупаемость: чек ${fmt(PAY.check)} × ${PAY.cl} кл./день × ${PAY.days} дн.; аренда ${fmt(PAY.rent)}; прибыль ${fmt(c.profit)}/мес; ${tail}`+cmpBlock()}
+function payChart(){const cv=$('pch'),x=cv.getContext('2d'),c=payCalc(),W=cv.width,H=cv.height;x.fillStyle='#150d27';x.fillRect(0,0,W,H);
+ const max=Math.max(c.eq*1.3,c.profit*12,1);for(let m=1;m<=12;m++){const v=c.profit*m,h=Math.max(0,Math.round(Math.min(v,max)/max*(H-16)));x.fillStyle=(c.eq>0&&v>=c.eq)?'#6fe08a':'#ffd93d';x.fillRect(5+(m-1)*25,H-8-h,18,h)}
+ if(c.eq>0){const y=Math.round(H-8-c.eq/max*(H-16));x.fillStyle='#ff6b9d';x.fillRect(0,y,W,2)}
+ x.fillStyle='#b9a9e0';x.font='9px Inter,system-ui,sans-serif';x.fillText('0',2,H-1);x.fillText('6',W/2,H-1);x.fillText('12 мес',W-38,H-1)}
+function payUI(){const c=payCalc();
+ $('p1v').textContent=fmt(PAY.rent);$('p2v').textContent=fmt(PAY.check);
+ $('p3v').textContent=PAY.cl+' кл./день';$('p4v').textContent=PAY.days+' дн.';
+ $('p5v').textContent=fmt(PAY.cons);$('p6v').textContent=PAY.tax+'%';$('p7v').textContent=fmt(PAY.ads);
+ $('q1').textContent=fmt(c.rev);$('q2').textContent=fmt(c.cost);$('q3').textContent=fmt(c.profit);$('q4').textContent=c.eq?fmt(c.eq):'нет мебели';
+ const v=$('q5');
+ if(!c.eq)v.innerHTML='<b>Оборудование не выбрано.</b> Добавьте мебель в кабинет — и посчитаем окупаемость.';
+ else if(c.profit<=0)v.innerHTML='<b>Так не окупается.</b> '+(c.be>0?'Прибыль '+fmt(c.profit)+' в месяц. Нужно минимум <b>'+c.be+'</b> '+plural(c.be,'клиент','клиента','клиентов')+' в день или чек повыше.':'Чек не покрывает расходники — поднимите средний чек.');
+ else v.innerHTML='Окупится за <b>'+Math.ceil(c.payback)+' мес.</b> За 12 месяцев кабинет принесёт ≈ <b>'+fmt(c.profit*12)+'</b> чистыми. Безубыточность — <b>'+c.be+'</b> кл./день.';
+ $('pcap').textContent=(!c.eq||c.profit<=0)?'График появится, когда будет выбрана мебель и прибыль выше нуля.':(c.payback<1?'Столбцы — прибыль по месяцам, вложения окупаются раньше первого месяца.':'Столбцы — прибыль по месяцам, розовая линия — вложения '+fmt(c.eq)+', окупаются на '+Math.ceil(c.payback)+'-м мес.'); payChart()}
+[['p1','rent'],['p2','check'],['p3','cl'],['p4','days'],['p5','cons'],['p6','tax'],['p7','ads']].forEach(([id,k])=>{const el=$(id);el.value=PAY[k];el.oninput=()=>{PAY[k]=+el.value;payUI();if(PAY.add)draw()}});
+// --- сравнение с обычным креслом ---
+const CMP={p1:20000,life1:2,rep1:6000,down1:8,life2:6,uplift:15,h:3,seen:false};
+const cmpPrice=()=>paySum()||31900;
+function cmpSide(check,clients,price,life,rep,down){const tax=PAY.tax/100,rev=check*clients*PAY.days,cons=PAY.cons*clients*PAY.days,tx=rev*tax,amort=price/(life*12),repM=rep/12,lost=(check-PAY.cons)*(1-tax)*clients*down/12,profit=rev-cons-tx-PAY.rent-PAY.ads-amort-repM-lost;return{check,clients,price,life,rep,down,rev,cons,tx,amort,repM,lost,profit}}
+function cmpCalc(){const p2=cmpPrice(),a=cmpSide(PAY.check,PAY.cl,CMP.p1,CMP.life1,CMP.rep1,CMP.down1),b=cmpSide(PAY.check*(1+CMP.uplift/100),PAY.cl,p2,CMP.life2,0,0),adv=b.profit-a.profit,mon=CMP.h*12,invA=a.price*CMP.h/a.life,invB=b.price*CMP.h/b.life,buy=b.price-a.price,inv=invB-invA;return{a,b,adv,mon,invA,invB,buy,inv,gain:adv*mon,payback:adv>0&&inv>0?inv/adv:0}}
+function cmpBlock(){if(!CMP.seen)return'';const c=cmpCalc();return`\nСравнение с обычным креслом: ${fmt(c.a.price)} (${c.a.life} ${plural(c.a.life,'год','года','лет')}) против Timkush ${fmt(c.b.price)} (${c.b.life} ${plural(c.b.life,'год','года','лет')}); за ${CMP.h} ${plural(CMP.h,'год','года','лет')} прибыль ${fmt(Math.round(c.a.profit*c.mon))} против ${fmt(Math.round(c.b.profit*c.mon))}, разница ${fmt(Math.round(c.gain))}; ${c.buy>0?'переплата '+fmt(c.buy)+' отбивается за '+(c.inv<=0?'первый месяц':(c.payback<1?'меньше месяца':Math.ceil(c.payback)+' мес.')):'при покупке дешевле на '+fmt(-c.buy)}.`}
+function cmpUI(){const c=cmpCalc(),A=c.a,B=c.b,h=CMP.h;
+ $('c1v').textContent=fmt(CMP.p1);$('c2v').textContent=CMP.life1+' '+plural(CMP.life1,'год','года','лет');$('c3v').textContent=fmt(CMP.rep1);
+ $('c4v').textContent=CMP.down1+' дн.';$('c5v').textContent=CMP.life2+' '+plural(CMP.life2,'год','года','лет')+' (×'+(CMP.life2/CMP.life1).toFixed(1).replace('.',',')+')';$('c6v').textContent=CMP.uplift+'%';
+ const rows=[['Цена, ₽',fmt(A.price),fmt(B.price)],
+  ['Срок службы',A.life+' '+plural(A.life,'год','года','лет'),B.life+' '+plural(B.life,'год','года','лет')],
+  ['Вложений за '+h+' '+plural(h,'год','года','лет'),fmt(Math.round(A.price*h/A.life)),fmt(Math.round(B.price*h/B.life))],
+  ['Амортизация в месяц',fmt(Math.round(A.amort)),fmt(Math.round(B.amort))],
+  ['Ремонт за '+h+' '+plural(h,'год','года','лет'),fmt(Math.round(A.rep*h)),'—'],
+  ['Потери от простоя',fmt(Math.round(A.lost*h*12)),'—'],
+  ['Средний чек',fmt(A.check),fmt(B.check)],
+  ['Прибыль за '+h+' '+plural(h,'год','года','лет'),fmt(Math.round(A.profit*c.mon)),fmt(Math.round(B.profit*c.mon))]];
+ $('cmpBody').innerHTML=rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('');
+ const v=$('cver');
+ if(c.gain>0){const p=['За '+h+' '+plural(h,'год','года','лет')+' Timkush принесёт на <b>'+fmt(Math.round(c.gain))+'</b> больше.'];p.push(c.buy>0?'Переплата '+fmt(c.buy)+' отбивается за <b>'+(c.inv<=0?'первый же месяц':(c.payback<1?'меньше месяца':Math.ceil(c.payback)+' мес.'))+'</b>.':'При покупке Timkush ещё и дешевле на <b>'+fmt(-c.buy)+'</b>.');p.push('Вложения за '+h+' '+plural(h,'год','года','лет')+': '+fmt(Math.round(c.invA))+' против '+fmt(Math.round(c.invB))+(c.inv<0?' — Timkush дешевле в пересчёте на срок службы.':'.'));p.push('Владение в месяц: <b>'+fmt(Math.round(A.amort+A.repM))+'</b> против <b>'+fmt(Math.round(B.amort+B.repM))+'</b>.');if(A.lost>0)p.push('Плюс у обычного <b>'+fmt(Math.round(A.lost))+'/мес</b> теряется на простое.');v.innerHTML=p.join(' ')}
+ else v.innerHTML='При таких вводных переплата не отбивается — разница в пользу дешёвого. Поднимите надбавку к чеку или срок службы Timkush.';
+}
+[['c1','p1'],['c2','life1'],['c3','rep1'],['c4','down1'],['c5','life2'],['c6','uplift']].forEach(([id,k])=>{const el=$(id);el.value=CMP[k];el.oninput=()=>{CMP[k]=+el.value;cmpUI();if(PAY.add)draw()}});
+$('tabA').onclick=()=>{$('tabA').classList.add('on');$('tabB').classList.remove('on');$('paneA').classList.add('on');$('paneB').classList.remove('on')};
+$('tabB').onclick=()=>{CMP.seen=true;$('tabB').classList.add('on');$('tabA').classList.remove('on');$('paneB').classList.add('on');$('paneA').classList.remove('on');cmpUI();if(PAY.add)draw()};
+function payClose(){document.body.classList.remove('pov-on');$('pov').classList.remove('on');$('payOpen').focus()}
+$('payOpen').onclick=()=>{payUI();document.body.classList.add('pov-on');$('pov').classList.add('on');const pb=$('pov').querySelector('.pbox');pb.setAttribute('tabindex','-1');pb.focus()};
+$('pX').onclick=payClose;
+$('pov').onclick=e=>{if(e.target===$('pov'))payClose()};
+$('payAdd').onclick=()=>{PAY.add=!PAY.add;$('payAdd').textContent=PAY.add?'Расчёт добавлен в заявку ✓':'Добавить расчёт в заявку';draw()};
+addEventListener('keydown',e=>{if(e.key==='Escape')payClose()});
+
+// подгонка сцены под фактическую высоту экрана (мобильная версия)
+function fitStage(){
+ const w=document.querySelector('.app>div');if(!w)return;
+ if(innerWidth>1100||innerHeight<=560){w.style.removeProperty('--stgw');w.style.removeProperty('--z');return}
+ const leg=w.querySelector('.leg');
+ const r=w.getBoundingClientRect(),legH=leg?leg.getBoundingClientRect().height:0;
+ const availH=Math.max(120,r.height-legH-2);
+ const ww=Math.max(150,Math.min(r.width,460));
+ const dia=(W()+D())*G.t,artH=dia/2+WH*G.zk;
+ const zx=.90*CW/dia,zy=.94*availH*CW/(artH*ww);
+ const z=Math.max(1,Math.min(1.6,zx,zy));
+ w.style.setProperty('--stgw',Math.round(ww)+'px');
+ w.style.setProperty('--z',z.toFixed(3));
+}
+addEventListener('resize',fitStage);
+addEventListener('orientationchange',()=>setTimeout(fitStage,150));
+addEventListener('load',fitStage);
+
+resize();fitStage();add('a',5,2,200);add('f',10,6,650);st.sel=null;draw();
+</script></body></html>
+
+
